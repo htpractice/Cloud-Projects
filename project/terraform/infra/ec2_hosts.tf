@@ -105,3 +105,25 @@ module "app" {
     Environment = var.environment
   }
 }
+
+# Create the Windows bastion host
+module "windows_bastion" {
+  source  = "terraform-aws-modules/ec2-instance/aws"
+  version = "~> 3.0"
+
+  name           = "${var.environment}-windows-bastion"
+  ami            = var.windows_ami
+  instance_type  = var.windows_instance_type
+  associate_public_ip_address = true
+  key_name       = aws_key_pair.generated_key.key_name
+  subnet_id      = module.devops-ninja-vpc.public_subnets[0]
+  vpc_security_group_ids = [module.bastion_sg.security_group_id]
+  root_block_device = {
+    volume_size = 30
+    volume_type = "gp2"
+  }
+  tags = {
+    Name = "${var.environment}-windows-bastion"
+    Environment = var.environment
+  }
+}
