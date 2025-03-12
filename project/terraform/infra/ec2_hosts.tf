@@ -36,6 +36,41 @@ module "bastion" {
   }
 }
 
+# Use null_resource to run provisioner on bastion host
+resource "null_resource" "provision_bastion" {
+  depends_on = [module.bastion]
+
+  provisioner "file" {
+    source      = "private_key.pem"
+    destination = "/tmp/private_key.pem"
+
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"  # Adjust this based on your AMI
+      private_key = file("private_key.pem")
+      host        = module.bastion.public_ip
+    }
+    
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo apt-get update -y",
+      "sudo apt-get install -y software-properties-common",
+      "sudo apt-add-repository -y --update ppa:ansible/ansible",
+      "sudo apt-get install -y ansible"
+    ]
+    
+
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"  # Adjust this based on your AMI
+      private_key = file("private_key.pem")
+      host        = module.bastion.public_ip
+    }
+  }
+}
+
 # Create the Jenkins server
 module "jenkins" {
   source  = "terraform-aws-modules/ec2-instance/aws"
