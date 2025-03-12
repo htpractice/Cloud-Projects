@@ -52,6 +52,13 @@ module "bastion_sg" {
       cidr_blocks = "${chomp(data.http.self_ip.response_body)}/32" # Remove the newline character and add /32
     },
     {
+      from_port   = 3389
+      to_port     = 3389
+      protocol    = "tcp"
+      description = "RDP from self IP"
+      cidr_blocks = "${chomp(data.http.self_ip.response_body)}/32" # Remove the newline character and add /32
+    }
+    {
       from_port   = 80
       to_port     = 80
       protocol    = "tcp"
