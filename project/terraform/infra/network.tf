@@ -93,7 +93,7 @@ module "private_instance_sg" {
   ingress_with_cidr_blocks = [
     {
       from_port   = 0
-      to_port     = 0
+      to_port     = 65535
       description = "All traffic"
       protocol    = "tcp"
       cidr_blocks = var.vpc_cidr
