@@ -28,6 +28,7 @@ module "bastion" {
   key_name       = aws_key_pair.generated_key.key_name
   subnet_id      = module.devops-ninja-vpc.public_subnets[0]
   vpc_security_group_ids = [module.bastion_sg.security_group_id]
+  iam_instance_profile = aws_iam_instance_profile.bastion_instance_profile.name
 
   tags = {
     Name = "${var.environment}-bastion"
