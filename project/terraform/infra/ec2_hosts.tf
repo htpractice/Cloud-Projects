@@ -118,10 +118,10 @@ module "windows_bastion" {
   key_name       = aws_key_pair.generated_key.key_name
   subnet_id      = module.devops-ninja-vpc.public_subnets[0]
   vpc_security_group_ids = [module.bastion_sg.security_group_id]
-  root_block_device = {
+  root_block_device = [{
     volume_size = 30
     volume_type = "gp2"
-  }
+  }]
   tags = {
     Name = "${var.environment}-windows-bastion"
     Environment = var.environment
