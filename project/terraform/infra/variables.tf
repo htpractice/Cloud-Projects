@@ -44,3 +44,15 @@ variable "app_count" {
   description = "The count of instances to launch"
   default = 2
 }
+
+variable "windows_ami" {
+  description = "AMI ID for the Windows instances"
+  default = "ami-07fa5275316057f54"
+  type        = string
+}
+
+variable "windows_instance_type" {
+  description = "Instance type for the Windows instances"
+  default     = "t3.micro"
+  type        = string
+}
