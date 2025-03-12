@@ -41,16 +41,15 @@ resource "null_resource" "provision_bastion" {
   depends_on = [module.bastion]
 
   provisioner "file" {
-    source      = "private_key.pem"
+    source      = local_file.private_key_pem.filename
     destination = "/home/ubuntu/private_key.pem"
 
     connection {
       type        = "ssh"
       user        = "ubuntu"  # Adjust this based on your AMI
-      private_key = file("private_key.pem")
+      private_key = tls_private_key.instance_key.private_key_pem
       host        = module.bastion.public_ip
     }
-    
   }
 
   provisioner "remote-exec" {
@@ -58,14 +57,14 @@ resource "null_resource" "provision_bastion" {
       "sudo apt-get update -y",
       "sudo apt-get install -y software-properties-common",
       "sudo apt-add-repository -y --update ppa:ansible/ansible",
-      "sudo apt-get install -y ansible"
+      "sudo apt-get install -y ansible",
+      "chmod 600 /home/ubuntu/private_key.pem"
     ]
-    
 
     connection {
       type        = "ssh"
       user        = "ubuntu"  # Adjust this based on your AMI
-      private_key = file("private_key.pem")
+      private_key = tls_private_key.instance_key.private_key_pem
       host        = module.bastion.public_ip
     }
   }
