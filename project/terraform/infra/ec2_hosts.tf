@@ -42,7 +42,7 @@ resource "null_resource" "provision_bastion" {
 
   provisioner "file" {
     source      = "private_key.pem"
-    destination = "/tmp/private_key.pem"
+    destination = "/home/ubuntu/private_key.pem"
 
     connection {
       type        = "ssh"
