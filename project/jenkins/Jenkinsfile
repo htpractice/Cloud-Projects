@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        SSH_KEY = credentials('jenkins-ssh-key') // Replace with the ID of the SSH key credential in Jenkins
+        SSH_KEY = credentials('app-instance-key') // Replace with the ID of the SSH key credential in Jenkins
     }
 
     stages {
