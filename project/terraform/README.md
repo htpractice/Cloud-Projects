@@ -60,3 +60,4 @@ Generate an AWS key using the Terraform resource block.
 ```sh
 terraform output -raw private_key_pem > private_key.pem
 chmod 600 private_key.pem
+```
