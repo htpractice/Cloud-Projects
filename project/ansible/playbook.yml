@@ -40,7 +40,7 @@
 
     - name: Copy AWS CLI installation script
       copy:
-        src: /path/to/aws_cli.sh
+        src: /home/ubuntu/ht-practice-work/project/aws_cli.sh
         dest: /tmp/aws_cli.sh
         mode: '0755'
 
