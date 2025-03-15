@@ -90,6 +90,15 @@ resource "aws_iam_policy" "ecr_policy" {
         ]
         Effect   = "Allow"
         Resource = "*"
+      },
+      {
+        Action = [
+          "ec2:Describe*",
+          "ec2:Get*",
+          "ec2:List*"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
       }
     ]
   })
