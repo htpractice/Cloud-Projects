@@ -56,7 +56,7 @@ module "bastion_sg" {
       to_port     = 3389
       protocol    = "tcp"
       description = "RDP from self IP"
-      cidr_blocks = "${chomp(data.http.self_ip.response_body)}/32" # Remove the newline character and add /32
+      cidr_blocks = var.my_local_IP # local ip of your machine with GUI to connect to windows bastion
     },
     {
       from_port   = 80
