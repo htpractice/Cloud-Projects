@@ -8,7 +8,7 @@ resource "aws_lb" "app_alb" {
 
 resource "aws_lb_target_group" "front_end" {
   name     = "front-end"
-  port     = 80
+  port     = 8000 # The port the target is listening on (instance port) for movie-app
   protocol = "HTTP"
   vpc_id   = module.devops-ninja-vpc.vpc_id
 
@@ -25,7 +25,7 @@ resource "aws_lb_target_group" "front_end" {
 
 resource "aws_lb_listener" "front_end" {
   load_balancer_arn = aws_lb.app_alb.arn
-  port              = 80
+  port              = 8000
   protocol          = "HTTP"
 
   default_action {
@@ -42,7 +42,7 @@ resource "aws_lb_target_group_attachment" "front_end" {
   }
   target_group_arn = aws_lb_target_group.front_end.arn
   target_id        = each.value
-  port             = 80
+  port             = 8000 # The port the target is listening on (instance port) for movie-app
 }
 
 # Create an internal ALB for Jenkins
@@ -56,7 +56,7 @@ resource "aws_lb" "jenkins_alb" {
 
 resource "aws_lb_target_group" "jenkins" {
   name     = "jenkins"
-  port     = 8080
+  port     = 8080 # The port the target is listening on (instance port) for Jenkins
   protocol = "HTTP"
   vpc_id   = module.devops-ninja-vpc.vpc_id
 
@@ -73,7 +73,7 @@ resource "aws_lb_target_group" "jenkins" {
 
 resource "aws_lb_listener" "jenkins" {
   load_balancer_arn = aws_lb.jenkins_alb.arn
-  port              = 8080
+  port              = 8080 # The port the target is listening on (instance port) for Jenkins
   protocol          = "HTTP"
 
   default_action {
@@ -88,5 +88,5 @@ resource "aws_lb_target_group_attachment" "jenkins" {
   }
   target_group_arn = aws_lb_target_group.jenkins.arn
   target_id        = each.value
-  port             = 8080
+  port             = 8080 # The port the target is listening on (instance port) for Jenkins
 }
