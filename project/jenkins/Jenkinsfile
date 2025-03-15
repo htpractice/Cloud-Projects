@@ -1,22 +1,72 @@
 pipeline {
     agent any
 
-//   environment {
-//     SSH_KEY = credentials('app-instance-key') // Replace with the ID of the SSH key credential in Jenkins
-//    }
+    environment {
+        AWS_REGION = 'us-east-1' // Replace with your AWS region
+        ENVIRONMENT = 'dev' // Replace with your environment
+        AWS_ACCOUNT = '123456789012' // Replace with your AWS account ID
+    }
 
     stages {
-        stage('SSH to App Hosts') {
+        stage('Fetch App Hosts') {
             steps {
                 script {
-                    // Define the list of app hosts
-                    def appHosts = ['10.1.1.95', '10.1.2.213'] // Replace with the actual IPs of the app instances
+                    // Fetch the IP addresses of the app instances
+                    def appHosts = sh(script: """
+                        aws ec2 describe-instances --region ${AWS_REGION} --filters "Name=tag:Name,Values=${ENVIRONMENT}-app-*" "Name=instance-state-name,Values=running" --query "Reservations[*].Instances[*].PrivateIpAddress" --output text
+                    """, returnStdout: true).trim().split()
 
+                    // Store the IP addresses in an environment variable
+                    env.APP_HOSTS = appHosts.join(' ')
+                }
+            }
+        }
+
+        stage('Checking out code') {
+            steps {
+                git 'https://github.com/htpractice/ht-practice-work.git'
+            }
+        }
+
+        stage ('Building Docker Image') {
+            steps {
+                script {
+                    sh """
+                        cd project/movies-app/client
+                        docker build -t movies-client:latest .
+                        cd ../server
+                        docker build -t movies-server:latest .
+                    """
+                }
+            }
+        }
+
+        stage ('Pushing Docker Image') {
+            steps {
+                script {
+                    sh """
+                        docker tag movies-client:latest ${AWS_ACCOUNT}.dkr.ecr.us-east-1.amazonaws.com/movies-client:latest
+                        docker tag movies-server:latest ${AWS_ACCOUNT}.dkr.ecr.us-east-1.amazonaws.com/movies-server:latest
+                        docker push ${AWS_ACCOUNT}.dkr.ecr.us-east-1.amazonaws.com/movies-client:latest
+                        docker push ${AWS_ACCOUNT}.dkr.ecr.us-east-1.amazonaws.com/movies-server:latest
+                    """
+                }
+            }
+        }
+
+        stage('Deploy to App Hosts') {
+            steps {
+                script {
                     // Iterate over the app hosts and run commands on each
-                    for (host in appHosts) {
+                    for (host in env.APP_HOSTS.split()) {
                         sshagent(credentials: ['app-instance-key']) {
                             sh """
-                                ssh -o StrictHostKeyChecking=no ubuntu@${host} 'echo "Hello from Jenkins on ${host}"'
+                                ssh -o StrictHostKeyChecking=no ubuntu@${host} '
+                                   git clone https://github.com/htpractice/ht-practice-work.git
+                                      cd ht-practice-work/project/movies-app
+                                      docker-compose down
+                                      docker-compose up -d
+                                '
                             """
                         }
                     }
