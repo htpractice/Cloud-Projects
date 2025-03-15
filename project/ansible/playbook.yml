@@ -2,6 +2,9 @@
 ---
 - hosts: all
   become: true
+  vars:
+    aws_region: "{{ aws_region }}"
+    ecr_registry: "{{ ecr_registry }}"
   tasks:
     - name: Install aptitude
       apt:
@@ -46,7 +49,11 @@
 
     - name: Run AWS CLI installation script
       shell: /tmp/aws_cli.sh
-    
+      
+    - name: Log in to ECR
+      shell: |
+        aws ecr get-login-password --region {{ aws_region }} | docker login --username AWS --password-stdin {{ ecr_registry }}
+
     - name: Copy private key
       copy:
         src: /home/ubuntu/private_key.pem
