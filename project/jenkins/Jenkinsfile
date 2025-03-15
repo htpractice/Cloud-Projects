@@ -2,15 +2,18 @@ pipeline {
     agent any
 
     environment {
-        APP_HOST = ['10.1.1.95','10.1.2.213'] // Replace with the actual IP of the app instance
         SSH_KEY = credentials('jenkins-ssh-key') // Replace with the ID of the SSH key credential in Jenkins
     }
 
-    stage('SSH to App Hosts') {
+    stages {
+        stage('SSH to App Hosts') {
             steps {
                 script {
+                    // Define the list of app hosts
+                    def appHosts = ['10.1.1.95', '10.1.2.213'] // Replace with the actual IPs of the app instances
+
                     // Iterate over the app hosts and run commands on each
-                    for (host in env.APP_HOST) {
+                    for (host in appHosts) {
                         sshagent([env.SSH_KEY]) {
                             sh """
                                 ssh -o StrictHostKeyChecking=no ubuntu@${host} 'echo "Hello from Jenkins on ${host}"'
@@ -20,4 +23,5 @@ pipeline {
                 }
             }
         }
+    }
 }
