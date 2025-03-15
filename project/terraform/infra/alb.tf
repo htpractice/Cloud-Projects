@@ -61,7 +61,7 @@ resource "aws_lb_target_group" "jenkins" {
   vpc_id   = module.devops-ninja-vpc.vpc_id
 
   health_check {
-    path                = "/"
+    path                = "/jenkins"
     protocol            = "HTTP"
     port                = "traffic-port"
     healthy_threshold   = 2
