@@ -37,7 +37,7 @@
         name: docker-ce
         state: latest
         update_cache: true
-        
+
     - name: Copy AWS CLI installation script
       copy:
         src: /path/to/aws_cli.sh
@@ -46,3 +46,9 @@
 
     - name: Run AWS CLI installation script
       shell: /tmp/aws_cli.sh
+    
+    - name: Copy private key
+      copy:
+        src: /home/ubuntu/private_key.pem
+        dest: /home/ubuntu/private_key.pem
+        mode: '0600'
