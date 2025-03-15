@@ -56,3 +56,8 @@ variable "windows_instance_type" {
   default     = "t3.micro"
   type        = string
 }
+
+variable "my_local_IP" {
+  description = "Local IP address, get it using https://whatismyipaddress.com/"
+  type        = string
+}
