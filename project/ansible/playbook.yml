@@ -39,6 +39,23 @@
         name: docker-ce
         state: latest
         update_cache: true
+    
+    - name: Check if AWS CLI is installed
+      command: aws --version
+      register: aws_cli_version
+      ignore_errors: true
+
+    - name: Remove existing AWS CLI v1
+      shell: |
+        sudo rm /usr/local/bin/aws
+        sudo rm -rf /usr/local/aws-cli
+      when: aws_cli_version.stdout is search("aws-cli/1")
+
+    - name: Remove existing AWS CLI v2
+      shell: |
+        sudo rm /usr/local/bin/aws
+        sudo rm -rf /usr/local/aws-cli
+      when: aws_cli_version.stdout is search("aws-cli/2")
 
     - name: Download AWS CLI Bundled Installer
       get_url:
