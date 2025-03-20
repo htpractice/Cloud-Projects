@@ -1,4 +1,4 @@
-#This snippet is a playbook file that installs Docker on the EC2 instances. The playbook file is named playbook.yml.
+# This snippet is a playbook file that installs Docker on the EC2 instances. The playbook file is named playbook.yml.
 ---
 - hosts: all
   become: true
@@ -45,7 +45,7 @@
         src: /home/ubuntu/ht-practice-work/project/aws_cli.sh
         dest: /tmp/aws_cli.sh
         mode: '0755'
-    
+
     - name: Check and remove existing AWS CLI
       shell: aws --version
       register: aws_cli_version
@@ -53,12 +53,20 @@
       changed_when: false
 
     - name: Remove existing AWS CLI
-      shell: sudo rm /usr/local/bin/aws , sudo rm -rf /usr/local/aws-cli
+      shell: sudo rm /usr/local/bin/aws && sudo rm -rf /usr/local/aws-cli
       when: aws_cli_version.rc == 0
 
-    - name: Run AWS CLI installation script
-      shell: /tmp/aws_cli.sh
-      
+    - name: Install expect package
+      apt:
+        name: expect
+        state: present
+
+    - name: Run AWS CLI installation script with expect
+      expect:
+        command: /tmp/aws_cli.sh
+        responses:
+          'replace aws/THIRD_PARTY_LICENSES? [y]es, [n]o, [A]ll, [N]one, [r]ename:': 'y'
+
     - name: Log in to ECR
       shell: |
         aws ecr get-login-password --region {{ aws_region }} | docker login --username AWS --password-stdin {{ ecr_registry }}
