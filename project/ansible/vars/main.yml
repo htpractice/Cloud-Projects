@@ -1,0 +1,2 @@
+aws_region: "us-east-1"
+ecr_registry: "401036938979.dkr.ecr.us-east-1.amazonaws.com/dev-jenkins-app-repo"
