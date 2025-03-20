@@ -66,6 +66,7 @@
         command: /tmp/aws_cli.sh
         responses:
           'replace aws/THIRD_PARTY_LICENSES? [y]es, [n]o, [A]ll, [N]one, [r]ename:': 'y'
+        timeout: 600
 
     - name: Log in to ECR
       shell: |
