@@ -40,33 +40,19 @@
         state: latest
         update_cache: true
 
-    - name: Copy AWS CLI installation script
-      copy:
-        src: /home/ubuntu/ht-practice-work/project/aws_cli.sh
-        dest: /tmp/aws_cli.sh
-        mode: '0755'
+    - name: Download AWS CLI Bundled Installer
+      get_url:
+        url: "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
+        dest: "/tmp/awscliv2.zip"
 
-    - name: Check and remove existing AWS CLI
-      shell: aws --version
-      register: aws_cli_version
-      ignore_errors: yes
-      changed_when: false
+    - name: Unzip AWS CLI Bundled Installer
+      unarchive:
+        src: "/tmp/awscliv2.zip"
+        dest: "/tmp"
+        remote_src: yes
 
-    - name: Remove existing AWS CLI
-      shell: sudo rm /usr/local/bin/aws && sudo rm -rf /usr/local/aws-cli
-      when: aws_cli_version.rc == 0
-
-    - name: Install expect package
-      apt:
-        name: expect
-        state: present
-
-    - name: Run AWS CLI installation script with expect
-      expect:
-        command: /tmp/aws_cli.sh
-        responses:
-          'replace aws/THIRD_PARTY_LICENSES? [y]es, [n]o, [A]ll, [N]one, [r]ename:': 'y'
-        timeout: 600
+    - name: Install AWS CLI
+      shell: "/tmp/aws/install"
 
     - name: Log in to ECR
       shell: |
