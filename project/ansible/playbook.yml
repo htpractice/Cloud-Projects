@@ -60,7 +60,7 @@
     
     - name: Build Docker image
       shell: |
-        cd ./docker
+        cd ../docker
         docker build -t jenkins-image .
 
     - name: Tag Docker image
