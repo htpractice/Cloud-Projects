@@ -21,7 +21,7 @@ module "bastion" {
   source  = "terraform-aws-modules/ec2-instance/aws"
   version = "~> 3.0"
 
-  name           = "${var.environment}-bastion"
+  name           = "${var.environment}-linux-bastion"
   ami            = var.ami
   instance_type  = var.instance_type
   associate_public_ip_address = true
@@ -31,7 +31,7 @@ module "bastion" {
   iam_instance_profile = aws_iam_instance_profile.bastion_instance_profile.name
 
   tags = {
-    Name = "${var.environment}-bastion"
+    Name = "${var.environment}-linux-bastion"
     Environment = var.environment
   }
 }
