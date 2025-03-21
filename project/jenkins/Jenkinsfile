@@ -17,9 +17,9 @@ pipeline {
             steps {
                 script {
                     // Fetch the IP addresses of the app instances
-                    def appHosts = sh(script: """
+                    def appHosts = sh(script: '''
                         aws ec2 describe-instances --region ${AWS_REGION} --filters "Name=tag:Name,Values=${ENVIRONMENT}-app-*" "Name=instance-state-name,Values=running" --query "Reservations[*].Instances[*].PrivateIpAddress" --output text
-                    """, returnStdout: true).trim().split()
+                    ''', returnStdout: true).trim().split()
 
                     // Store the IP addresses in an environment variable
                     env.APP_HOSTS = appHosts.join(' ')
@@ -36,14 +36,14 @@ pipeline {
         stage ('Building Docker Image') {
             steps {
                 script {
-                    sh """
+                    sh '''
                         echo 'Current directory: $(pwd)'
                         ls -l
                         cd project/movies-app/client || exit 1
                         sudo docker build -t movies-client:latest .
                         cd ../server || exit 1
                         sudo docker build -t movies-server:latest .
-                    """
+                    '''
                 }
             }
         }
@@ -51,12 +51,12 @@ pipeline {
         stage ('Pushing Docker Image') {
             steps {
                 script {
-                    sh """
+                    sh '''
                         sudo docker tag movies-client:latest ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/dev-movie-app-client-repo:latest
                         sudo docker tag movies-server:latest ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/dev-movie-app-server-repo:latest
                         sudo docker push ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/dev-movie-app-client-repo:latest
                         sudo docker push ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/dev-movie-app-server-repo:latest
-                    """
+                    '''
                 }
             }
         }
@@ -67,13 +67,14 @@ pipeline {
                     // Iterate over the app hosts and run commands on each
                     for (host in env.APP_HOSTS.split()) {
                         sshagent(credentials: ['app-instance-key']) {
-                            sh """
+                            sh '''
                                 ssh -o StrictHostKeyChecking=no ubuntu@${host} '
                                     cd /home/ubuntu
                                     sudo docker-compose pull || exit 1
                                     sudo docker-compose down || exit 1
                                     sudo docker-compose up -d || exit 1
-                            """
+                                '
+                            '''
                         }
                     }
                 }
