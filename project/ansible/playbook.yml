@@ -13,3 +13,10 @@
     - vars/main.yml
   roles:
     - docker_build
+
+- hosts: app_nodes
+  become: true
+  vars_files:
+    - vars/main.yml
+  roles:
+    - docker_compose
