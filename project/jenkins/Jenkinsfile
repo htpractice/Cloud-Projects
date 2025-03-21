@@ -40,9 +40,9 @@ pipeline {
                         echo 'Current directory: $(pwd)'
                         ls -l
                         cd project/movie-app/client || exit 1
-                        sudo docker build -t movies-client:latest .
+                        docker build -t movies-client:latest .
                         cd ../server || exit 1
-                        sudo docker build -t movies-server:latest .
+                        docker build -t movies-server:latest .
                     '''
                 }
             }
@@ -52,10 +52,10 @@ pipeline {
             steps {
                 script {
                     sh '''
-                        sudo docker tag movies-client:latest ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/dev-movie-app-client-repo:latest
-                        sudo docker tag movies-server:latest ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/dev-movie-app-server-repo:latest
-                        sudo docker push ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/dev-movie-app-client-repo:latest
-                        sudo docker push ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/dev-movie-app-server-repo:latest
+                        docker tag movies-client:latest ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/dev-movie-app-client-repo:latest
+                        docker tag movies-server:latest ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/dev-movie-app-server-repo:latest
+                        docker push ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/dev-movie-app-client-repo:latest
+                        docker push ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/dev-movie-app-server-repo:latest
                     '''
                 }
             }
