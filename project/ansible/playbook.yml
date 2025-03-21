@@ -8,5 +8,8 @@
     - common
 
 - hosts: localhost
+  become: true
+  vars_files:
+    - vars/main.yml
   roles:
     - docker_build
