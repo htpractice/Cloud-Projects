@@ -2,12 +2,12 @@
 - name: Build Docker image
   shell: |
     cd ../docker
-    docker build -t jenkins-image .
+    sudo docker build -t jenkins-image .
 
 - name: Tag Docker image
   shell: |
-    docker tag jenkins-image:latest {{ ecr_registry }}/jenkins-image:latest
+    sudo docker tag jenkins-image:latest {{ ecr_registry }}/jenkins-image:latest
 
 - name: Push Docker image to ECR
   shell: |
-    docker push {{ ecr_registry }}/jenkins-image:latest
+    sudo docker push {{ ecr_registry }}/jenkins-image:latest
