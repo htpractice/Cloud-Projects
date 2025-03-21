@@ -5,8 +5,15 @@ plugin: amazon.aws.aws_ec2
 regions:
   - us-east-1
 filters:
-  # # This selects only running instances with tag `Name` set to `jenkins` or `app` or `bastion`.
-  tag:Name: ["*-jenkins*", "*-app*", "*linux-bastion*"]
-  #tag:Terraform: true
+  # This selects only running instances with tag `Name` set to `jenkins`, `app`, or `bastion`.
+  tag:Name: ["*-jenkins*", "*-app-*", "*linux-bastion*"]
   tag:Environment: dev
   instance-state-name: running
+keyed_groups:
+  - key: tags.Name
+    prefix: name_
+hostnames:
+  - tag:Name
+compose:
+  ansible_host: public_ip_address
+  ansible_user: ubuntu
