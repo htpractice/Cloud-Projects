@@ -1,4 +1,4 @@
-# This playbook uses roles to install AWS CLI and Docker on all nodes and build and push Docker image on the Ansible controller.
+# This playbook uses roles to install AWS CLI and Docker on all nodes and build and push Docker image on the Ansible controller, while adding docker compose to app nodes
 ---
 - hosts: all
   become: true
