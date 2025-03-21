@@ -33,34 +33,30 @@ pipeline {
             }
         }
 
-        stage('Building Docker Image') {
+        stage ('Building Docker Image') {
             steps {
                 script {
-                    docker.image('docker:latest').inside('-v /var/run/docker.sock:/var/run/docker.sock') {
-                        sh '''
-                            echo 'Current directory: $(pwd)'
-                            ls -l
-                            cd project/movie-app/client || exit 1
-                            docker build -t movies-client:latest .
-                            cd ../server || exit 1
-                            docker build -t movies-server:latest .
-                        '''
-                    }
+                    sh '''
+                        echo 'Current directory: $(pwd)'
+                        ls -l
+                        cd project/movie-app/client || exit 1
+                        docker build -t movies-client:latest .
+                        cd ../server || exit 1
+                        docker build -t movies-server:latest .
+                    '''
                 }
             }
         }
 
-        stage('Pushing Docker Image') {
+        stage ('Pushing Docker Image') {
             steps {
                 script {
-                    docker.image('docker:latest').inside('-v /var/run/docker.sock:/var/run/docker.sock') {
-                        sh '''
-                            docker tag movies-client:latest ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/dev-movie-app-client-repo:latest
-                            docker tag movies-server:latest ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/dev-movie-app-server-repo:latest
-                            docker push ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/dev-movie-app-client-repo:latest
-                            docker push ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/dev-movie-app-server-repo:latest
-                        '''
-                    }
+                    sh '''
+                        docker tag movies-client:latest ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/dev-movie-app-client-repo:latest
+                        docker tag movies-server:latest ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/dev-movie-app-server-repo:latest
+                        docker push ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/dev-movie-app-client-repo:latest
+                        docker push ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/dev-movie-app-server-repo:latest
+                    '''
                 }
             }
         }
