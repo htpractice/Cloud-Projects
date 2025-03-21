@@ -68,7 +68,11 @@
 
 - name: Log in to ECR
   shell: |
-    aws ecr get-login-password --region {{ aws_region }} | docker login --username AWS --password-stdin {{ ecr_registry }}
+    aws ecr get-login-password --region {{ aws_region }} | docker login --username AWS --password-stdin 401036938979.dkr.ecr.us-east-1.amazonaws.com/{{ item }}
+  with_items:
+    - {{ jenkins_repo }}
+    - {{ movie_client_repo }}
+    - {{ movie_server_repo }}
 
 - name: Download Docker Compose
   get_url:
