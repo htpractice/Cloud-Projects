@@ -38,3 +38,13 @@ output "app_instances" {
 output "windows_bastion_host" {
   value = module.windows_bastion.public_ip
 }
+
+# Output for the ALB listener where we can access the movie app
+output "alb_dns_name" {
+  value = aws_lb.app_alb.dns_name
+}
+
+# Output for the ALB listener where we can access Jenkins
+output "jenkins_alb_dns_name" {
+  value = aws_lb.jenkins_alb.dns_name
+}
