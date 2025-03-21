@@ -68,7 +68,7 @@
 
 - name: Log in to ECR
   shell: |
-    aws ecr get-login-password --region {{ aws_region }} | docker login --username AWS --password-stdin 401036938979.dkr.ecr.us-east-1.amazonaws.com/{{ item }}
+    aws ecr get-login-password --region {{ aws_region }} | docker login --username AWS --password-stdin {{ ecr_registry }}/{{ item }}
   with_items:
     - "{{ jenkins_repo }}"
     - "{{ movie_client_repo }}"
