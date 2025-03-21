@@ -28,7 +28,7 @@ module "bastion" {
   key_name       = aws_key_pair.generated_key.key_name
   subnet_id      = module.devops-ninja-vpc.public_subnets[0]
   vpc_security_group_ids = [module.bastion_sg.security_group_id]
-  iam_instance_profile = aws_iam_instance_profile.bastion_instance_profile.name
+  iam_instance_profile = aws_iam_instance_profile.common_instance_profile.name
 
   tags = {
     Name = "${var.environment}-linux-bastion"
@@ -81,7 +81,7 @@ module "jenkins" {
   key_name       = aws_key_pair.generated_key.key_name
   subnet_id      = module.devops-ninja-vpc.private_subnets[0]
   vpc_security_group_ids = [module.private_instance_sg.security_group_id]
-  iam_instance_profile = aws_iam_instance_profile.jenkins_app_instance_profile.name
+  iam_instance_profile = aws_iam_instance_profile.common_instance_profile.name
 
   tags = {
     Name = "${var.environment}-jenkins"
@@ -101,7 +101,7 @@ module "app" {
   subnet_id      = module.devops-ninja-vpc.private_subnets[count.index % length(module.devops-ninja-vpc.private_subnets)]
   vpc_security_group_ids = [module.private_instance_sg.security_group_id]
   availability_zone = var.azs[count.index % length(var.azs)]
-  iam_instance_profile = aws_iam_instance_profile.jenkins_app_instance_profile.name
+  iam_instance_profile = aws_iam_instance_profile.common_instance_profile.name
   
   tags = {
     Name = "${var.environment}-app-${count.index + 1}"
