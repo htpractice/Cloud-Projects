@@ -4,9 +4,14 @@ output "key_name" {
 }
 
 
-# Output the repository URL
+# Output the jenkins repository URL
 output "jenkins_app_repo_url" {
   value = aws_ecr_repository.jenkins_app_repo.repository_url
+}
+
+# Output the movie repository URL
+output "movie_app_repo_url" {
+  value = aws_ecr_repository.movie_app_repo.repository_url
 }
 
 #Output for the bastion host
