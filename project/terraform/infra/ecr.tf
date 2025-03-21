@@ -13,8 +13,3 @@ resource "aws_ecr_repository" "jenkins_app_repo" {
     Environment = var.environment
   }
 }
-
-# Output the repository URL
-output "jenkins_app_repo_url" {
-  value = aws_ecr_repository.jenkins_app_repo.repository_url
-}
