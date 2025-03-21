@@ -6,8 +6,8 @@
 
 - name: Tag Docker image
   shell: |
-    sudo docker tag jenkins-image:latest {{ ecr_registry }}/jenkins-image:latest
+    sudo docker tag jenkins-image:latest {{ ecr_registry }}/dev-jenkins-app-repo:latest
 
 - name: Push Docker image to ECR
   shell: |
-    sudo docker push {{ ecr_registry }}/jenkins-image:latest
+    sudo docker push {{ ecr_registry }}/dev-jenkins-app-repo:latest
