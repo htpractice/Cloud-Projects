@@ -1,2 +1,4 @@
 aws_region: "us-east-1"
-ecr_registry: "401036938979.dkr.ecr.us-east-1.amazonaws.com/dev-jenkins-app-repo"
+jenkins_repo: "dev-jenkins-app-repo"
+movie_client_repo: "dev-movie-client-app-repo"
+movie_server_repo: "dev-movie-server-app-repo"
