@@ -38,9 +38,9 @@ pipeline {
                 script {
                     sh """
                         cd project/movies-app/client
-                        docker build -t movies-client:latest .
+                        sudo docker build -t movies-client:latest .
                         cd ../server
-                        docker build -t movies-server:latest .
+                        sudo docker build -t movies-server:latest .
                     """
                 }
             }
@@ -50,10 +50,10 @@ pipeline {
             steps {
                 script {
                     sh """
-                        docker tag movies-client:latest ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/movies-client:latest
-                        docker tag movies-server:latest ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/movies-server:latest
-                        docker push ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/movies-client:latest
-                        docker push ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/movies-server:latest
+                        sudo docker tag movies-client:latest ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/dev-movie-app-client-repo:latest
+                        sudo docker tag movies-server:latest ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/dev-movie-app-server-repo:latest
+                        sudo docker push ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/dev-movie-app-client-repo:latest
+                        sudo docker push ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/dev-movie-app-server-repo:latest
                     """
                 }
             }
@@ -67,11 +67,10 @@ pipeline {
                         sshagent(credentials: ['app-instance-key']) {
                             sh """
                                 ssh -o StrictHostKeyChecking=no ubuntu@${host} '
-                                   git clone https://github.com/htpractice/ht-practice-work.git
-                                      cd ht-practice-work/project/movies-app
-                                      docker-compose down
-                                      docker-compose up -d
-                                '
+                                    cd /home/ubuntu
+                                    sudo docker-compose pull || exit 1
+                                    sudo docker-compose down || exit 1
+                                    sudo docker-compose up -d || exit 1
                             """
                         }
                     }
