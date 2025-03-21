@@ -29,7 +29,7 @@ pipeline {
 
         stage('Checking out code') {
             steps {
-                git 'https://github.com/htpractice/ht-practice-work.git'
+                git branch: 'devopsninja-project', url: 'https://github.com/htpractice/ht-practice-work.git'
             }
         }
 
