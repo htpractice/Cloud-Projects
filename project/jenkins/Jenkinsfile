@@ -39,7 +39,7 @@ pipeline {
                     sh '''
                         echo 'Current directory: $(pwd)'
                         ls -l
-                        cd project/movies-app/client || exit 1
+                        cd project/movie-app/client || exit 1
                         sudo docker build -t movies-client:latest .
                         cd ../server || exit 1
                         sudo docker build -t movies-server:latest .
