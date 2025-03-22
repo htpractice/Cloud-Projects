@@ -49,7 +49,14 @@ module "bastion_sg" {
       to_port     = 22
       protocol    = "tcp"
       description = "SSH from self IP"
-      cidr_blocks = "${chomp(data.http.self_ip.response_body)}/32" # Remove the newline character and add /32
+      cidr_blocks = "${chomp(data.http.self_ip.response_body)}/32" # This will be the ip of your lab-server
+    },
+    {
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      description = "SSH from self IP"
+      cidr_blocks = var.my_local_IP # local ip of your machine to connect to bastion
     },
     {
       from_port   = 3389
