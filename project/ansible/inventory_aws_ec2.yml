@@ -11,7 +11,7 @@ filters:
   instance-state-name: running
 keyed_groups:
   - key: tags.Name
-    prefix: name_
+    prefix: name
 hostnames:
   - tag:Name
 compose:
