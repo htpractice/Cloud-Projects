@@ -1,5 +1,7 @@
 FROM jenkins/jenkins:lts
-
+ARG REGION=us-east-1
+ARG AWS_ACCOUNT_ID
+ARG AWS_REPO_NAME
 # Switch to the root user to install packages
 USER root
 
@@ -17,6 +19,9 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/aws
 # Install Docker using the script
 RUN curl https://get.docker.com/ > dockerinstall && chmod 777 dockerinstall && ./dockerinstall && rm dockerinstall
 
+RUN for repo in ${AWS_REPO_NAMES}; do \
+        aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/$repo; \
+    done
 # Add Jenkins user to the docker group
 RUN usermod -aG docker jenkins
 
