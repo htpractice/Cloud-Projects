@@ -84,8 +84,3 @@
     path: /usr/local/bin/docker-compose
     mode: '0755'
     state: file
-
-- name: Create Docker Compose file from template
-  template:
-    src: ../../docker_compose/templates/docker-compose.yml.j2
-    dest: /home/ubuntu/docker-compose.yml
