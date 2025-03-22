@@ -14,7 +14,7 @@
   roles:
     - docker_build
 
-- hosts: name_dev-app-*
+- hosts: name_dev_app_*
   become: true
   vars_files:
     - vars/main.yml
