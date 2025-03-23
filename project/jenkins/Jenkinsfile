@@ -21,6 +21,9 @@ pipeline {
                         aws ec2 describe-instances --region ${AWS_REGION} --filters "Name=tag:Name,Values=${ENVIRONMENT}-app-*" "Name=instance-state-name,Values=running" --query "Reservations[*].Instances[*].PrivateIpAddress" --output text
                     ''', returnStdout: true).trim().split()
 
+                    // Debugging: Print the fetched IP addresses
+                    echo "Fetched App Hosts: ${appHosts}"
+
                     // Store the IP addresses in an environment variable
                     env.APP_HOSTS = appHosts.join(' ')
                 }
@@ -64,6 +67,9 @@ pipeline {
         stage('Deploy to App Hosts') {
             steps {
                 script {
+                    // Debugging: Print the APP_HOSTS environment variable
+                    echo "App Hosts: ${env.APP_HOSTS}"
+
                     // Iterate over the app hosts and run commands on each
                     for (host in env.APP_HOSTS.split()) {
                         sshagent(credentials: ['app-instance-key']) {
