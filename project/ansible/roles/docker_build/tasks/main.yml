@@ -2,7 +2,7 @@
 - name: Build Docker image
   shell: |
     cd ../docker
-    sh build.sh {{ aws_region }} {{ aws_account_id }} {{ movie_client_repo }} {{ movie_server_repo }}
+    bash ./build.sh {{ aws_region }} {{ aws_account_id }} {{ movie_client_repo }} {{ movie_server_repo }}
 
 - name: Tag Docker image
   shell: |
