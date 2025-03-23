@@ -82,7 +82,10 @@ module "jenkins" {
   subnet_id      = module.devops-ninja-vpc.private_subnets[0]
   vpc_security_group_ids = [module.private_instance_sg.security_group_id]
   iam_instance_profile = aws_iam_instance_profile.common_instance_profile.name
-
+  root_block_device = [{
+    volume_size = 30
+    volume_type = "gp2"
+  }]
   tags = {
     Name = "${var.environment}-jenkins"
     Environment = var.environment
@@ -102,6 +105,10 @@ module "app" {
   vpc_security_group_ids = [module.private_instance_sg.security_group_id]
   availability_zone = var.azs[count.index % length(var.azs)]
   iam_instance_profile = aws_iam_instance_profile.common_instance_profile.name
+  root_block_device = [{
+    volume_size = 20
+    volume_type = "gp2"
+  }]
   
   tags = {
     Name = "${var.environment}-app-${count.index + 1}"
