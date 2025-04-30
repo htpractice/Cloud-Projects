@@ -1,28 +1,53 @@
-param location string = resourceGroup().location
-param appServicePlanName string = 'myAppServicePlan'
-param webAppName string = 'internal-static-site-${uniqueString(resourceGroup().id)}'
+// main.bicep
+// Orchestrates deployment of VNets, VMs, Load Balancer, Firewall, and Storage
 
-resource appServicePlan 'Microsoft.Web/serverfarms@2022-03-01' = {
-  name: appServicePlanName
-  location: location
-  sku: {
-    name: 'F1'
-    tier: 'Free'
+param location1 string = 'East US'
+param location2 string = 'East US 2'
+
+module vnets 'vnets.bicep' = {
+  name: 'vnetDeployment'
+  params: {
+    location1: location1
+    location2: location2
   }
 }
 
-resource webApp 'Microsoft.Web/sites@2022-03-01' = {
-  name: webAppName
-  location: location
-  properties: {
-    serverFarmId: appServicePlan.id
-    siteConfig: {
-      appSettings: [
-        {
-          name: 'WEBSITE_RUN_FROM_PACKAGE'
-          value: '1'
-        }
-      ]
-    }
+module lb 'loadbalancer.bicep' = {
+  name: 'lbDeployment'
+  dependsOn: [vnets]
+  params: {
+    location1: location1
   }
+}
+
+module vms 'vms.bicep' = {
+  name: 'vmDeployment'
+  dependsOn: [vnets, lb]
+  params: {
+    location1: location1
+    location2: location2
+    backendPoolId: lb.outputs.backendPoolId // Pass the load balancer backend pool ID
+  }
+}
+
+module firewall 'firewall.bicep' = {
+  name: 'firewallDeployment'
+  dependsOn: [vnets]
+  params: {
+    location2: location2
+  }
+}
+
+resource storageAccount 'Microsoft.Storage/storageAccounts@2021-09-01' = {
+  name: 'eastuszrsstorage'
+  location: location1
+  sku: {
+    name: 'Standard_LRS' // Updated to comply with allowed storage account types
+  }
+  kind: 'StorageV2'
+}
+
+module storage 'storage.bicep' = {
+  name: 'storageDeployment'
+  dependsOn: [vnets]
 }
