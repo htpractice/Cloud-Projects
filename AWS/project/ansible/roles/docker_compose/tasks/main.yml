@@ -1,0 +1,6 @@
+# Ansible role to set up Docker Compose for a web application. This role creates a Docker Compose file from a template and deploys it to the target hosts.
+---
+- name: Create Docker Compose file from template
+  template:
+    src: ../templates/docker-compose.yml.j2
+    dest: /home/ubuntu/docker-compose.yml
