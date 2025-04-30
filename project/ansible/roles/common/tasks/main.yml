@@ -1,3 +1,4 @@
+# This role installs AWS CLI and Docker on all nodes and builds and pushes Docker image on the Ansible controller, while adding docker compose to app nodes.
 ---
 - name: Install aptitude
   apt:

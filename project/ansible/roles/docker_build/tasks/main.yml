@@ -1,4 +1,4 @@
----
+# This file is part of the Movie App opensource project. This will be used to build and push the Docker image to AWS ECR.
 - name: Build Docker image
   shell: |
     cd ../docker
