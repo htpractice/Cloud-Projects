@@ -1,0 +1,40 @@
+pipeline {
+    agent any
+
+    environment {
+        AWS_REGION = 'us-east-1' // Replace with your AWS region
+        ENVIRONMENT = 'dev' // Replace with your environment
+        SSH_KEY = credentials('jenkins-ssh-key') // Replace with the ID of the SSH key credential in Jenkins
+    }
+
+    stages {
+        stage('Fetch App Hosts') {
+            steps {
+                script {
+                    // Fetch the IP addresses of the app instances
+                    def appHosts = sh(script: """
+                        aws ec2 describe-instances --region ${AWS_REGION} --filters "Name=tag:Name,Values=${ENVIRONMENT}-app-*" "Name=instance-state-name,Values=running" --query "Reservations[*].Instances[*].PrivateIpAddress" --output text
+                    """, returnStdout: true).trim().split()
+
+                    // Store the IP addresses in an environment variable
+                    env.APP_HOSTS = appHosts.join(' ')
+                }
+            }
+        }
+
+        stage('SSH to App Hosts') {
+            steps {
+                script {
+                    // Iterate over the app hosts and run commands on each
+                    for (host in env.APP_HOSTS.split()) {
+                        sshagent(['SSH_KEY']) {
+                            sh """
+                                ssh -o StrictHostKeyChecking=no ubuntu@${host} 'echo "Hello from Jenkins on ${host}"'
+                            """
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
