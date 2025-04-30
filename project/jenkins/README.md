@@ -6,7 +6,7 @@ sudo docker run --name myjenkins -p 8080:8080 -p 50000:50000 -v /var/jenkins_hom
 To run the Jenkins container with the context path `/jenkins`, use the following Docker command:
 
 ```sh
-sudo docker run --name myjenkins -p 8080:8080 -p 50000:50000 -v /var/jenkins_home:/var/jenkins_home -e JENKINS_OPTS="--prefix=/jenkins" jenkins/jenkins:lts
+sudo docker run -itd --name myjenkins -p 8080:8080 -p 50000:50000 -v /var/jenkins_home:/var/jenkins_home -e JENKINS_OPTS="--prefix=/jenkins" jenkins/jenkins:lts
 
 
 ### Explanation:
