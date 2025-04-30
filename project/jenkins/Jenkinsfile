@@ -1,0 +1,90 @@
+pipeline {
+    agent any
+
+    parameters {
+        string(name: 'AWS_REGION', defaultValue: 'us-east-1', description: 'AWS region')
+        string(name: 'ENVIRONMENT', defaultValue: 'dev', description: 'Environment')
+        string(name: 'AWS_ACCOUNT', description: 'AWS account ID')
+    }
+    environment {
+        AWS_REGION = "${params.AWS_REGION}"
+        ENVIRONMENT = "${params.ENVIRONMENT}"
+        AWS_ACCOUNT = "${params.AWS_ACCOUNT}"
+    }
+
+    stages {
+        stage('Fetch App Hosts') {
+            steps {
+                script {
+                    // Fetch the IP addresses of the app instances
+                    def appHosts = sh(script: '''
+                        aws ec2 describe-instances --region ${AWS_REGION} --filters "Name=tag:Name,Values=${ENVIRONMENT}-app-*" "Name=instance-state-name,Values=running" --query "Reservations[*].Instances[*].PrivateIpAddress" --output text
+                    ''', returnStdout: true).trim().split()
+
+                    // Debugging: Print the fetched IP addresses
+                    echo "Fetched App Hosts: ${appHosts}"
+
+                    // Store the IP addresses in an environment variable
+                    env.APP_HOSTS = appHosts.join(' ')
+                }
+            }
+        }
+
+        stage('Checking out code') {
+            steps {
+                git branch: 'devopsninja-project', url: 'https://github.com/htpractice/ht-practice-work.git'
+            }
+        }
+
+        stage ('Building Docker Image') {
+            steps {
+                script {
+                    sh '''
+                        echo 'Current directory: $(pwd)'
+                        ls -l
+                        cd project/movie-app/client || exit 1
+                        docker build -t movies-client:latest .
+                        cd ../server || exit 1
+                        docker build -t movies-server:latest .
+                    '''
+                }
+            }
+        }
+
+        stage ('Pushing Docker Image') {
+            steps {
+                script {
+                    sh '''
+                        docker tag movies-client:latest ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/dev-movie-app-client-repo:latest
+                        docker tag movies-server:latest ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/dev-movie-app-server-repo:latest
+                        docker push ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/dev-movie-app-client-repo:latest
+                        docker push ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/dev-movie-app-server-repo:latest
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy to App Hosts') {
+            steps {
+                script {
+                    // Debugging: Print the APP_HOSTS environment variable
+                    echo "App Hosts: ${env.APP_HOSTS}"
+
+                    // Iterate over the app hosts and run commands on each
+                    for (host in env.APP_HOSTS.split()) {
+                        sshagent(credentials: ['app-instance-key']) {
+                            sh """
+                                ssh -o StrictHostKeyChecking=no ubuntu@${host} '
+                                    cd /home/ubuntu
+                                    sudo docker-compose pull || exit 1
+                                    sudo docker-compose down || exit 1
+                                    sudo docker-compose up -d || exit 1
+                                '
+                            """
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
