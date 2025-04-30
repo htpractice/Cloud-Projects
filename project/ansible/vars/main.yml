@@ -1,7 +1,0 @@
-aws_region: "us-east-1"
-jenkins_repo: "dev-jenkins-app-repo"
-movie_client_repo: "dev-movie-client-app-repo"
-movie_server_repo: "dev-movie-server-app-repo"
-ecr_registry: "401036938979.dkr.ecr.us-east-1.amazonaws.com"
-aws_account_id: "401036938979"
-# This snippet from project/ansible/roles/docker_build/tasks/main.yml specifies the AWS region, the repository names for the Jenkins, client, and server applications, the ECR registry, and the AWS account ID.
