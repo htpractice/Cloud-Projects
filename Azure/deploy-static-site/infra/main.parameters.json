@@ -1,0 +1,19 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location1": {
+      "value": "eastus"
+    },
+    "location2": {
+      "value": "eastus2"
+    },
+    "sshPublicKey": {
+      "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDqP7biub8mpn6hpS4369AtSa7YPI/6R5sv8L3ryeb43FICQSXc0zR+B2LYK6n8GUM8OEunnpHwK0XS6Kfm7i4sQGU6sUOHYP6SCApucfhlUDcGL7s7l9OCbdOLWCoq6u7dQ9dQZVzN+g+eBdWmPJZW0p9PTwrAfqHhxv10/eEdFv7Wvs261gFFEQnZeUzgl0lAZjApk7tcxgQZV75v4yFq0hd5VFQgBQccYMoaqDuChkQjFuxypWkUrwfmvUX2h0MfJvepDDs6UrhDomIKLtdnZ9ShMEHA3yyOXcwzYMfkSiPU45gozTd/gvYzDqIf7sqdjIqxlBU5pIxhzcCMrFnwoGAkYCeWMY/2064bXqZF98gczeDO4lR3hRqmWKVRzdYte3ORbwv5sZLB2WW1gIwb138EG5iMeOX6o2+kyTuL9Mkfm6bU2NQYSXQLFRhAd392dTx9KcLB7XZZxSkrot/wJOv5mw47qIfQcfb5K9gWjhCePmknehj0QtmGH1lttWE= generated-by-azure"
+    },
+    "allowedVmSize": {
+      "value": "Standard_B2ms"
+    }
+  }
+}
+

@@ -13,6 +13,9 @@ param backendPoolId string = '' // Parameter for load balancer backend pool
 ])
 param allowedVmSize string = 'Standard_B2ms'
 
+@description('SSH public key for Linux VM')
+param sshPublicKey string
+
 resource availSet 'Microsoft.Compute/availabilitySets@2023-03-01' = {
   name: 'webAvailSet'
   location: location1
@@ -61,6 +64,42 @@ module w1Nsg 'nsg.bicep' = {
   }
 }
 
+module linuxNsg 'nsg.bicep' = {
+  name: 'linuxNsgDeployment'
+  params: {
+    nsgName: 'linuxNsg'
+    location: location1
+    securityRules: [
+      {
+        name: 'AllowSsh'
+        properties: {
+          priority: 100
+          direction: 'Inbound'
+          access: 'Allow'
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '22'
+          sourceAddressPrefix: '*'
+          destinationAddressPrefix: '*'
+        }
+      }
+      {
+        name: 'DenyAllInbound'
+        properties: {
+          priority: 200
+          direction: 'Inbound'
+          access: 'Deny'
+          protocol: '*'
+          sourcePortRange: '*'
+          destinationPortRange: '*'
+          sourceAddressPrefix: '*'
+          destinationAddressPrefix: '*'
+        }
+      }
+    ]
+  }
+}
+
 resource w1Nic 'Microsoft.Network/networkInterfaces@2023-04-01' = {
   name: 'w1Nic'
   location: location1
@@ -81,6 +120,27 @@ resource w1Nic 'Microsoft.Network/networkInterfaces@2023-04-01' = {
               id: backendPoolId
             }
           ] : []
+        }
+      }
+    ]
+  }
+}
+
+resource linuxNic 'Microsoft.Network/networkInterfaces@2023-04-01' = {
+  name: 'linuxNic'
+  location: location1
+  properties: {
+    networkSecurityGroup: {
+      id: linuxNsg.outputs.nsgId
+    }
+    ipConfigurations: [
+      {
+        name: 'ipConfig1'
+        properties: {
+          subnet: {
+            id: resourceId('Microsoft.Network/virtualNetworks/subnets', 'EastUS-VNet', 'webSubnet')
+        }
+          privateIPAllocationMethod: 'Dynamic'
         }
       }
     ]
@@ -111,7 +171,9 @@ resource w1 'Microsoft.Compute/virtualMachines@2023-03-01' = {
       }
       osDisk: {
         createOption: 'FromImage'
-        // Removed the managedDisk property to avoid storage account type modification
+        managedDisk: {
+          storageAccountType: 'Standard_LRS'
+        }
       }
     }
     networkProfile: {
@@ -124,6 +186,53 @@ resource w1 'Microsoft.Compute/virtualMachines@2023-03-01' = {
   }
 }
 
+resource linuxVm 'Microsoft.Compute/virtualMachines@2023-03-01' = {
+  name: 'linuxVm'
+  location: location1
+  properties: {
+    hardwareProfile: {
+      vmSize: allowedVmSize
+    }
+    osProfile: {
+      computerName: 'linuxVm'
+      adminUsername: 'azureuser'
+      linuxConfiguration: {
+        disablePasswordAuthentication: true
+        ssh: {
+          publicKeys: [
+            {
+              path: '/home/azureuser/.ssh/authorized_keys'
+              keyData: sshPublicKey
+            }
+          ]
+        }
+      }
+    }
+    storageProfile: {
+      imageReference: {
+        publisher: 'Canonical'
+        offer: 'UbuntuServer'
+        sku: '18.04-LTS'
+        version: 'latest'
+      }
+      osDisk: {
+        createOption: 'FromImage'
+        managedDisk: {
+          storageAccountType: 'Standard_LRS'
+        }
+      }
+    }
+    networkProfile: {
+      networkInterfaces: [
+        {
+          id: linuxNic.id
+        }
+      ]
+    }
+  }
+}
+
 // (w2 and WS11 VM definitions would go here with similar structure)
 
 output w1NicId string = w1Nic.id // Output the ID of the w1Nic resource
+output linuxNicId string = linuxNic.id
