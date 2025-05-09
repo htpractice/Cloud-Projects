@@ -1,0 +1,68 @@
+param location1 string
+param location2 string
+param eastUSVNetId string
+param eastUS2VNetId string
+param eastUSPublicIPId string
+param eastUS2PublicIPId string
+
+// VPN Gateway for EastUS VNet
+resource eastUSVpnGateway 'Microsoft.Network/virtualNetworkGateways@2023-09-01' = {
+  name: 'eastUSVpnGateway'
+  location: location1
+  properties: {
+    ipConfigurations: [
+      {
+        name: 'vpnGatewayIpConfig'
+        properties: {
+          publicIPAddress: {
+            id: eastUSPublicIPId
+          }
+          subnet: {
+            id: '${eastUSVNetId}/subnets/GatewaySubnet'
+          }
+        }
+      }
+    ]
+    gatewayType: 'Vpn'
+    vpnType: 'RouteBased'
+    enableBgp: false
+    sku: {
+      name: 'VpnGw1'
+    }
+  }
+}
+
+// VPN Gateway for EastUS2 VNet
+resource eastUS2VpnGateway 'Microsoft.Network/virtualNetworkGateways@2023-09-01' = {
+  name: 'eastUS2VpnGateway'
+  location: location2
+  properties: {
+    ipConfigurations: [
+      {
+        name: 'vpnGatewayIpConfig'
+        properties: {
+          publicIPAddress: {
+            id: eastUS2PublicIPId
+          }
+          subnet: {
+            id: '${eastUS2VNetId}/subnets/GatewaySubnet'
+          }
+        }
+      }
+    ]
+    gatewayType: 'Vpn'
+    vpnType: 'RouteBased'
+    enableBgp: false
+    sku: {
+      name: 'VpnGw1'
+    }
+  }
+}
+
+// Output the VPN Gateway IDs
+output eastUSVpnGatewayId string = eastUSVpnGateway.id
+output eastUS2VpnGatewayId string = eastUS2VpnGateway.id
+output eastUSVpnGatewayName string = eastUSVpnGateway.name
+output eastUS2VpnGatewayName string = eastUS2VpnGateway.name
+output eastUSVpnGatewayPublicIPId string = eastUSPublicIPId
+output eastUS2VpnGatewayPublicIPId string = eastUS2PublicIPId

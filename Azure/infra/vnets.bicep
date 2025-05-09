@@ -1,15 +1,17 @@
 // Task 1: Virtual Network Setup for Azure Capstone Project
 
 // Parameters
-param location1 string = 'East US'
-param location2 string = 'East US 2'
-param vnetPrefix1 string = '10.0.0.0/16'
-param vnetPrefix2 string = '10.1.0.0/16'
-param subnetPrefix1 string = '10.0.1.0/24'
-param subnetPrefix2 string = '10.1.1.0/24'
-param vnetName1 string = 'EastUS-VNet'
-param vnetName2 string = 'EastUS2-VNet'
-
+param location1 string
+param location2 string
+param vnetPrefix1 string
+param vnetPrefix2 string
+param webSubnetPrefix string
+param backendSubnetPrefix string
+param GatewaySubnet1Prefix string
+param GatewaySubnet2Prefix string
+param AzureFirewallSubnetPrefix string
+param vnetName1 string
+param vnetName2 string
 // EastUS VNet
 resource eastUSVNet 'Microsoft.Network/virtualNetworks@2023-04-01' = {
   name: vnetName1
@@ -22,7 +24,13 @@ resource eastUSVNet 'Microsoft.Network/virtualNetworks@2023-04-01' = {
       {
         name: 'webSubnet'
         properties: {
-          addressPrefix: subnetPrefix1
+          addressPrefix: webSubnetPrefix
+        }
+      }
+      {
+        name: 'GatewaySubnet'
+        properties: {
+          addressPrefix: GatewaySubnet1Prefix // Ensure at least a /27 subnet
         }
       }
     ]
@@ -41,70 +49,22 @@ resource eastUS2VNet 'Microsoft.Network/virtualNetworks@2023-04-01' = {
       {
         name: 'backendSubnet'
         properties: {
-          addressPrefix: subnetPrefix2
+          addressPrefix: backendSubnetPrefix
+        }
+      }
+      {
+        name: 'GatewaySubnet'
+        properties: {
+          addressPrefix: GatewaySubnet2Prefix // Ensure at least a /27 subnet
         }
       }
       {
         name: 'AzureFirewallSubnet' // Add this subnet for the firewall
         properties: {
-          addressPrefix: '10.1.2.0/24' // Ensure this does not overlap with other subnets
+          addressPrefix: AzureFirewallSubnetPrefix  // Ensure this does not overlap with other subnets
         }
       }
     ]
-  }
-}
-
-// VPN Gateway for EastUS VNet
-resource eastUSVpnGateway 'Microsoft.Network/virtualNetworkGateways@2023-04-01' = {
-  name: 'eastUSVpnGateway'
-  location: location1
-  properties: {
-    ipConfigurations: [
-      {
-        name: 'vpnGatewayIpConfig'
-        properties: {
-          publicIPAddress: {
-            id: eastUSPublicIP.id
-          }
-          subnet: {
-            id: '${eastUSVNet.id}/subnets/GatewaySubnet'
-          }
-        }
-      }
-    ]
-    gatewayType: 'Vpn'
-    vpnType: 'RouteBased'
-    enableBgp: false
-    sku: {
-      name: 'VpnGw1'
-    }
-  }
-}
-
-// VPN Gateway for EastUS2 VNet
-resource eastUS2VpnGateway 'Microsoft.Network/virtualNetworkGateways@2023-04-01' = {
-  name: 'eastUS2VpnGateway'
-  location: location2
-  properties: {
-    ipConfigurations: [
-      {
-        name: 'vpnGatewayIpConfig'
-        properties: {
-          publicIPAddress: {
-            id: eastUS2PublicIP.id
-          }
-          subnet: {
-            id: '${eastUS2VNet.id}/subnets/GatewaySubnet'
-          }
-        }
-      }
-    ]
-    gatewayType: 'Vpn'
-    vpnType: 'RouteBased'
-    enableBgp: false
-    sku: {
-      name: 'VpnGw1'
-    }
   }
 }
 
@@ -139,11 +99,13 @@ resource vnetPeering2 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@
 }
 
 // Outputs
-output vnet1Id string = eastUSVNet.id
-output vnet2Id string = eastUS2VNet.id
+output eastUSVNetId string = eastUSVNet.id
+output eastUS2VNetId string = eastUS2VNet.id
+output vnetName1 string = eastUSVNet.name
+output vnetName2 string = eastUS2VNet.name
 output peering1Id string = vnetPeering1.id
 output peering2Id string = vnetPeering2.id
 output webSubnetId string = eastUSVNet.properties.subnets[0].id
 output backendSubnetId string = eastUS2VNet.properties.subnets[0].id
-output vnet1Name string = eastUSVNet.name
-output vnet2Name string = eastUS2VNet.name
+output firewallSubnetId string = eastUS2VNet.properties.subnets[1].id
+

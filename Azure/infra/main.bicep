@@ -1,4 +1,11 @@
-// Deploy the Virtual Networks
+module publicIPs './publicIPs.bicep' = {
+  name: 'publicIPsDeployment'
+  params: {
+    location1: 'East US'
+    location2: 'East US 2'
+  }
+}
+
 module vnets './vnets.bicep' = {
   name: 'vnetsDeployment'
   params: {
@@ -6,53 +13,49 @@ module vnets './vnets.bicep' = {
     location2: 'East US 2'
     vnetPrefix1: '10.0.0.0/16'
     vnetPrefix2: '10.1.0.0/16'
-    subnetPrefix1: '10.0.1.0/24'
-    subnetPrefix2: '10.1.1.0/24'
-    vnetName1: 'EastUS-VNet'
-    vnetName2: 'EastUS2-VNet'
+    webSubnetPrefix :'10.0.1.0/24'
+    backendSubnetPrefix : '10.1.1.0/24'
+    GatewaySubnet1Prefix : '10.0.2.0/27'
+    GatewaySubnet2Prefix : '10.1.20.0/27'
+    AzureFirewallSubnetPrefix : '10.1.2.0/24'
+    vnetName1: 'eastUSVNet'
+    vnetName2: 'eastUS2VNet'
   }
 }
+// Don't have the permission to create the gateways in the current subscription
+//module gateways './gateways.bicep' = {
+//  name: 'gatewaysDeployment'
+//  params: {
+//    location1: 'East US'
+//    location2: 'East US 2'
+//    eastUSVNetId: vnets.outputs.eastUSVNetId
+//    eastUS2VNetId: vnets.outputs.eastUS2VNetId
+//    eastUSPublicIPId: publicIPs.outputs.eastUSPublicIPId
+//    eastUS2PublicIPId: publicIPs.outputs.eastUS2PublicIPId
+//  }
+//}
 
-// Deploy the Firewall (depends on vnets)
 module firewall './firewall.bicep' = {
   name: 'firewallDeployment'
   params: {
     location: 'East US 2'
-    vnetId: vnets.outputs.vnet2Id
+    vnetId: vnets.outputs.eastUS2VNetId
+    firewallPublicIPId: publicIPs.outputs.firewallPublicIPId
   }
-  dependsOn: [
-    vnets // Ensure the virtual networks are deployed before the firewall
-  ]
 }
 
-// Deploy the Virtual Machines (depends on vnets and firewall)
-module vm './vm.bicep' = {
-  name: 'vmDeployment'
+module nsgs './nsgs.bicep' = {
+  name: 'nsgsDeployment'
   params: {
-    location: 'East US'
+    location1: 'East US'
     location2: 'East US 2'
-    vmSize: 'Standard_B2ms'
-    osDiskType: 'Standard_LRS'
-    adminUsername: 'azureuser'
-    adminPassword: 'Password123!'
-    lbBackendPoolId: lbModule.outputs.backendPoolId
-    webSubnetId: vnets.outputs.webSubnetId
-    backendSubnetId: vnets.outputs.backendSubnetId
   }
-  dependsOn: [
-    vnets // Ensure the virtual networks are deployed before the VMs
-    firewall // Ensure the firewall is deployed before the VMs
-  ]
 }
 
-// Deploy the Load Balancer (depends on vnets)
-module lbModule './lb.bicep' = {
-  name: 'lbModule'
+module storage './storage.bicep' = {
+  name: 'storageDeployment'
   params: {
-    location: 'East US'
+    location1: 'East US'
+    location2: 'East US 2'
   }
-  dependsOn: [
-    vnets // Ensure the virtual networks are deployed before the load balancer
-    firewall
-  ]
 }
