@@ -12,6 +12,7 @@ param GatewaySubnet2Prefix string
 param AzureFirewallSubnetPrefix string
 param vnetName1 string
 param vnetName2 string
+param natGatewayPublicIPId string
 // EastUS VNet
 resource eastUSVNet 'Microsoft.Network/virtualNetworks@2023-04-01' = {
   name: vnetName1
@@ -25,6 +26,9 @@ resource eastUSVNet 'Microsoft.Network/virtualNetworks@2023-04-01' = {
         name: 'webSubnet'
         properties: {
           addressPrefix: webSubnetPrefix
+          natGateway: {
+            id: natGateway.id
+          }
         }
       }
       {
@@ -98,11 +102,26 @@ resource vnetPeering2 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@
   }
 }
 
+resource natGateway 'Microsoft.Network/natGateways@2023-04-01' = {
+  name: 'natGateway'
+  location: location1
+  properties: {
+    sku: {
+      name: 'Standard'
+    }
+    publicIpAddresses: [
+      {
+        id: natGatewayPublicIPId
+      }
+    ]
+  }
+}
+
 // Outputs
 output eastUSVNetId string = eastUSVNet.id
 output eastUS2VNetId string = eastUS2VNet.id
-output vnetName1 string = eastUSVNet.name
-output vnetName2 string = eastUS2VNet.name
+output eastUSVNetName string = eastUSVNet.name
+output eastUS2VNetName string = eastUS2VNet.name
 output peering1Id string = vnetPeering1.id
 output peering2Id string = vnetPeering2.id
 output webSubnetId string = eastUSVNet.properties.subnets[0].id

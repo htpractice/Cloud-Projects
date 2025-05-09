@@ -1,7 +1,7 @@
 // lb.bicep: Load Balancer Configuration
 
-param location string = 'East US'
-param lbName string = 'webServerLoadBalancer'
+param location string
+param lbName string
 
 // Public IP Resource (Created dynamically within this file)
 resource publicIP 'Microsoft.Network/publicIPAddresses@2023-04-01' = {
@@ -55,6 +55,9 @@ resource loadBalancingRule 'Microsoft.Network/loadBalancers/loadBalancingRules@2
     protocol: 'Tcp'
     frontendPort: 80
     backendPort: 80
+    enableFloatingIP: false
+    idleTimeoutInMinutes: 4
+    loadDistribution: 'Default'
   }
 }
 

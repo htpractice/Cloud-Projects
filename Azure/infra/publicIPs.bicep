@@ -36,8 +36,20 @@ resource firewallPublicIP 'Microsoft.Network/publicIPAddresses@2023-04-01' = {
     publicIPAllocationMethod: 'Static'
   }
 }
+// Public IP for NAT Gateway
+resource natGatewayPublicIP 'Microsoft.Network/publicIPAddresses@2023-04-01' = {
+  name: 'natGatewayPublicIP'
+  location: location1
+  sku: {
+    name: 'Standard' // NAT Gateway requires a Standard SKU Public IP
+  }
+  properties: {
+    publicIPAllocationMethod: 'Static'
+  }
+}
 
-// Output the public IP addresses
+// Output the Public IP ID for NAT Gateway // Output the public IP addresse
+output natGatewayPublicIPId string = natGatewayPublicIP.id
 output eastUSPublicIPId string = eastUSPublicIP.id
 output eastUS2PublicIPId string = eastUS2PublicIP.id
 output firewallPublicIPId string = firewallPublicIP.id

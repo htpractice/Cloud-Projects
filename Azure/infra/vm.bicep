@@ -1,11 +1,11 @@
 // vm.bicep: Virtual Machines Configuration
 
-param location string = 'East US'
-param location2 string = 'East US 2'
-param vmSize string = 'Standard_B2ms' // Allowed VM Size
-param osDiskType string = 'Standard_LRS' // Allowed OS Disk Type
-param adminUsername string = 'azureuser'
-param adminPassword string = 'Password123!'
+param location string 
+param location2 string
+param vmSize string
+param osDiskType string
+param adminUsername string
+param adminPassword string
 param webSubnetId string // Subnet ID for the NICs (passed from vnets.bicep)
 param backendSubnetId string // Subnet ID for the WS11 NIC (passed from vnets.bicep)
 
@@ -105,6 +105,41 @@ resource webServer2 'Microsoft.Compute/virtualMachines@2023-09-01' = {
     }
   }
 }
+
+// Custom Script Extension for webServer1
+resource webServer1Extension 'Microsoft.Compute/virtualMachines/extensions@2023-09-01' = {
+  name: 'installWebServer1'
+  location: location // Use the location parameter directly
+  parent: webServer1
+  properties: {
+    publisher: 'Microsoft.Azure.Extensions'
+    type: 'CustomScript'
+    typeHandlerVersion: '2.1'
+    autoUpgradeMinorVersion: true
+    settings: {
+      fileUris: [] // No external files needed
+      commandToExecute: 'bash -c "sudo apt update && sudo apt install -y nginx && echo Hello World from $(hostname) > /var/www/html/index.html && sudo systemctl restart nginx"'
+    }
+  }
+}
+
+// Custom Script Extension for webServer2
+resource webServer2Extension 'Microsoft.Compute/virtualMachines/extensions@2023-09-01' = {
+  name: 'installWebServer2'
+  location: location2 // Use the location2 parameter directly
+  parent: webServer2
+  properties: {
+    publisher: 'Microsoft.Azure.Extensions'
+    type: 'CustomScript'
+    typeHandlerVersion: '2.1'
+    autoUpgradeMinorVersion: true
+    settings: {
+      fileUris: [] // No external files needed
+      commandToExecute: 'bash -c "sudo apt update && sudo apt install -y nginx && echo Hello World from $(hostname) > /var/www/html/index.html && sudo systemctl restart nginx"'
+    }
+  }
+}
+
 resource ws11Vm 'Microsoft.Compute/virtualMachines@2023-09-01' = {
   name: 'WS11'
   location: location2
@@ -262,6 +297,7 @@ resource ws11Nic 'Microsoft.Network/networkInterfaces@2023-04-01' = {
     ]
   }
 }
+
 
 output vm1Id string = webServer1.id
 output vm2Id string = webServer2.id
