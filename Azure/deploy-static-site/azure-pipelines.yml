@@ -1,0 +1,21 @@
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- script: echo Hello, world!
+- task: AzureResourceManagerTemplateDeployment@3
+  inputs:
+    deploymentScope: 'Resource Group'
+    azureResourceManagerConnection: 'npupgradl-1696818415728(804635b5-c371-47ed-83cc-f44461dedd96)'
+    subscriptionId: '804635b5-c371-47ed-83cc-f44461dedd96'
+    action: 'Create Or Update Resource Group'
+    resourceGroupName: 'ade-sandbox-rg'
+    location: 'East US'
+    templateLocation: 'URL of the file'
+    csmFileLink: 'https://github.com/htpractice/Cloud-Projects.git'
+    overrideParameters: '-projectName DeployStaticWebsite'
+    deploymentMode: 'Incremental'
+    deploymentName: 'DeployPipelineTemplate'
