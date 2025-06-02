@@ -39,7 +39,7 @@ if (empty($rawInput)) {
 $data = json_decode($rawInput, true);
 
 // Debug: Log input data
-file_put_contents("book_debug.log", "Input: " . $rawInput . "\n", FILE_APPEND);
+file_put_contents("/tmp/book_debug.log", "Prepare failed: " . $conn->error . "\n", FILE_APPEND);
 
 // Check if decoding succeeded
 if (!$data || !isset($data["event_id"]) || !isset($data["user_email"])) {
@@ -60,14 +60,14 @@ if (!is_numeric($event_id)) {
 $event_id = intval($event_id);
 
 // Debug: Log processed data
-file_put_contents("book_debug.log", "event_id: $event_id, user_email: $user_email\n", FILE_APPEND);
+file_put_contents("/tmp/book_debug.log", "Prepare failed: " . $conn->error . "\n", FILE_APPEND);
 
 // Prepare and execute insert query
 $stmt = $conn->prepare("INSERT INTO bookings (event_id, user_email) VALUES (?, ?)");
 if (!$stmt) {
     http_response_code(500);
     echo json_encode(["message" => "Prepare failed: " . $conn->error]);
-    file_put_contents("book_debug.log", "Prepare failed: " . $conn->error . "\n", FILE_APPEND);
+    file_put_contents("/tmp/book_debug.log", "Prepare failed: " . $conn->error . "\n", FILE_APPEND);
     exit();
 }
 $stmt->bind_param("is", $event_id, $user_email);
@@ -77,7 +77,7 @@ if ($stmt->execute()) {
 } else {
     http_response_code(500);
     echo json_encode(["message" => "Booking failed: " . $stmt->error]);
-    file_put_contents("book_debug.log", "Execute failed: " . $stmt->error . "\n", FILE_APPEND);
+    file_put_contents("/tmp/book_debug.log", "Execute failed: " . $stmt->error . "\n", FILE_APPEND);
 }
 
 // Close connections

@@ -36,7 +36,7 @@ function bookTicket(eventTitle, eventId) {
   fetch("http://34.170.73.206/book.php", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ event_id: eventId, user_email: email })
+    body: JSON.stringify({ event_id: Number(eventId), user_email: email }) // Ensure event_id is integer
   })
   .then(res => res.json())
   .then(data => alert(data.message))
