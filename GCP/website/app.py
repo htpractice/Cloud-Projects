@@ -5,9 +5,9 @@ app = Flask(__name__)
 
 # Connect to Cloud SQL
 db = mysql.connector.connect(
-    host="YOUR_DB_IP",  # or use Cloud SQL Proxy with 127.0.0.1
-    user="youruser",
-    password="yourpass",
+    host="104.198.208.198",  # or use Cloud SQL Proxy with 127.0.0.1
+    user="root",
+    password="M7rk|(`J&H1+*I>i",
     database="eventsdb"
 )
 
