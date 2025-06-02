@@ -30,12 +30,16 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(["message" => "Method not allowed. Use POST."]);
     exit();
 }
-if (empty(file_get_contents("php://input"))) {
+$rawInput = file_get_contents("php://input");
+if (empty($rawInput)) {
     http_response_code(400);
     echo json_encode(["message" => "No input data provided."]);
     exit();
 }
-$data = json_decode(file_get_contents("php://input"), true);
+$data = json_decode($rawInput, true);
+
+// Debug: Log input data
+file_put_contents("book_debug.log", "Input: " . $rawInput . "\n", FILE_APPEND);
 
 // Check if decoding succeeded
 if (!$data || !isset($data["event_id"]) || !isset($data["user_email"])) {
@@ -47,13 +51,25 @@ if (!$data || !isset($data["event_id"]) || !isset($data["user_email"])) {
 $event_id = $data["event_id"];
 $user_email = $data["user_email"];
 
+// Ensure event_id is an integer
+if (!is_numeric($event_id)) {
+    http_response_code(400);
+    echo json_encode(["message" => "Invalid event_id."]);
+    exit();
+}
+$event_id = intval($event_id);
 
-// Extract event_id and user_email from input
-$event_id = $data["event_id"];
-$user_email = $data["user_email"];
+// Debug: Log processed data
+file_put_contents("book_debug.log", "event_id: $event_id, user_email: $user_email\n", FILE_APPEND);
 
 // Prepare and execute insert query
 $stmt = $conn->prepare("INSERT INTO bookings (event_id, user_email) VALUES (?, ?)");
+if (!$stmt) {
+    http_response_code(500);
+    echo json_encode(["message" => "Prepare failed: " . $conn->error]);
+    file_put_contents("book_debug.log", "Prepare failed: " . $conn->error . "\n", FILE_APPEND);
+    exit();
+}
 $stmt->bind_param("is", $event_id, $user_email);
 
 if ($stmt->execute()) {
@@ -61,6 +77,7 @@ if ($stmt->execute()) {
 } else {
     http_response_code(500);
     echo json_encode(["message" => "Booking failed: " . $stmt->error]);
+    file_put_contents("book_debug.log", "Execute failed: " . $stmt->error . "\n", FILE_APPEND);
 }
 
 // Close connections

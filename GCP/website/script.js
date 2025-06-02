@@ -32,6 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function bookTicket(eventTitle, eventId) {
   const email = prompt(`Enter your email to book: ${eventTitle}`);
+  if (!email) return; // Prevent POST if email is empty or prompt is cancelled
   fetch("http://34.170.73.206/book.php", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
