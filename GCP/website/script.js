@@ -1,23 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const staticEvents = [
-    {
-      id: 1,
-      title: "Coldplay Concert",
-      date: "2025-01-20",
-      location: "Mumbai, India",
-    },
-    {
-      id: 2,
-      title: "Comedy Night",
-      date: "2025-01-25",
-      location: "Delhi, India",
-    },
-    {
-      id: 3,
-      title: "Art Exhibition",
-      date: "2025-02-10",
-      location: "Bangalore, India",
-    },
+  const events = [
+    { id: 1, title: "Coldplay Concert", date: "2025-01-20", location: "Mumbai, India" },
+    { id: 2, title: "Comedy Night", date: "2025-01-25", location: "Delhi, India" },
+    { id: 3, title: "Art Exhibition", date: "2025-02-10", location: "Bangalore, India" },
   ];
 
   const eventList = document.querySelector(".event-list");
@@ -32,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <h3>${event.title}</h3>
         <p>Date: ${event.date}</p>
         <p>Location: ${event.location}</p>
-        <button onclick="bookTicket('${event.title}', '${eventId}')">Book Now</button>
+        <button onclick="bookTicket('${event.title}', '${event.id || event.title}')">Book Now</button>
       `;
       eventList.appendChild(eventCard);
     });
