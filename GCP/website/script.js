@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Try to load from server
-  fetch("http://YOUR_VM_IP/events.php")
+  fetch("http://34.170.73.206/events.php")
     .then(res => res.ok ? res.json() : Promise.reject())
     .then(events => Array.isArray(events) && events.length ? renderEvents(events) : renderEvents(staticEvents))
     .catch(() => renderEvents(staticEvents));
@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function bookTicket(eventTitle, eventId) {
   const email = prompt(`Enter your email to book: ${eventTitle}`);
-  fetch("http://YOUR_VM_IP/book.php", {
+  fetch("http://34.170.73.206/book.php", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ event_id: eventId, user_email: email })
@@ -56,9 +56,9 @@ function bookTicket(eventTitle, eventId) {
   .then(data => alert(data.message))
   .catch(err => alert("Booking failed."));
 }
-// Replace YOUR_VM_IP with the actual IP address of your VM
+// Replace 34.170.73.206 with the actual IP address of your VM
 function fetchBookings() {
-  fetch("http://YOUR_VM_IP/list_bookings.php")
+  fetch("http://34.170.73.206/list_bookings.php")
     .then(res => res.ok ? res.json() : Promise.reject())
     .then(bookings => {
       const bookingList = document.querySelector(".booking-list");
@@ -85,4 +85,4 @@ function fetchBookings() {
 fetchBookings(); // Call it after page load
 // Call this function to fetch bookings when needed
 // This function can be called on a button click or periodically to refresh the booking list
-// Ensure to replace YOUR_VM_IP with the actual IP address of your VM
+// Ensure to replace 34.170.73.206 with the actual IP address of your VM
