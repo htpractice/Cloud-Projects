@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lookmyshow-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: lookmyshow-app
+  template:
+    metadata:
+      labels:
+        app: lookmyshow-app
+    spec:
+      containers:
+      - name: lookmyshow-app
+        image: gcr.io/YOUR_PROJECT_ID/lookmyshow-app:latest
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - secretRef:
+            name: lookmyshow-db-secret
+        - configMapRef:
+            name: lookmyshow-db-config
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "512Mi"
+          limits:
+            cpu: "500m"
+            memory: "1Gi"
+        # Health checks
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 20
+          failureThreshold: 5
+      # Cloud SQL Auth Proxy sidecar
+      - name: cloud-sql-proxy
+        image: gcr.io/cloudsql-docker/gce-proxy:1.33.10
+        command: ["/cloud_sql_proxy",
+                  "-instances=YOUR_PROJECT_ID:YOUR_REGION:YOUR_INSTANCE_ID=tcp:5432",
+                  "-credential_file=/secrets/service_account.json"]
+        volumeMounts:
+        - name: service-account
+          mountPath: /secrets
+          readOnly: true
+      volumes:
+      - name: service-account
+        secret:
+          secretName: cloudsql-sa-key
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lookmyshow-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: lookmyshow-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080 
