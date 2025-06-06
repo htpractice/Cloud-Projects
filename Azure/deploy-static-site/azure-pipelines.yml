@@ -1,21 +1,66 @@
 trigger:
 - main
 
+variables:
+  resourceGroupName: 'ade-sandbox-rg'
+  location: 'East US'
+  templateFile: 'infra/main.bicep'
+  parametersFile: 'infra/main.parameters.json'
+
 pool:
   vmImage: ubuntu-latest
 
-steps:
-- script: echo Hello, world!
-- task: AzureResourceManagerTemplateDeployment@3
-  inputs:
-    deploymentScope: 'Resource Group'
-    azureResourceManagerConnection: 'npupgradl-1696818415728(804635b5-c371-47ed-83cc-f44461dedd96)'
-    subscriptionId: '804635b5-c371-47ed-83cc-f44461dedd96'
-    action: 'Create Or Update Resource Group'
-    resourceGroupName: 'ade-sandbox-rg'
-    location: 'East US'
-    templateLocation: 'URL of the file'
-    csmFileLink: 'https://github.com/htpractice/Cloud-Projects.git'
-    overrideParameters: '-projectName DeployStaticWebsite'
-    deploymentMode: 'Incremental'
-    deploymentName: 'DeployPipelineTemplate'
+stages:
+- stage: Deploy
+  displayName: 'Deploy Infrastructure'
+  jobs:
+  - job: DeployBicep
+    displayName: 'Deploy Bicep Templates'
+    steps:
+    - checkout: self
+    
+    - task: AzureCLI@2
+      displayName: 'Deploy Azure Resources'
+      inputs:
+        azureSubscription: '$(azureServiceConnection)' # Use variable instead of hardcoded value
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          # Deploy the main bicep template
+          az deployment group create \
+            --resource-group $(resourceGroupName) \
+            --template-file $(templateFile) \
+            --parameters @$(parametersFile) \
+            --parameters location1=$(location) \
+            --verbose
+          
+          # Get storage account name for static site hosting
+          STORAGE_ACCOUNT=$(az storage account list \
+            --resource-group $(resourceGroupName) \
+            --query "[?contains(name, 'eastuszrsstorage')].name" \
+            --output tsv)
+          
+          # Enable static website hosting
+          if [ ! -z "$STORAGE_ACCOUNT" ]; then
+            echo "Enabling static website hosting on $STORAGE_ACCOUNT"
+            az storage account update \
+              --name $STORAGE_ACCOUNT \
+              --resource-group $(resourceGroupName) \
+              --allow-blob-public-access true
+            
+            # Upload website files to blob storage
+            az storage blob upload-batch \
+              --account-name $STORAGE_ACCOUNT \
+              --destination '$web' \
+              --source 'website/' \
+              --overwrite
+            
+            # Get the static website URL
+            WEBSITE_URL=$(az storage account show \
+              --name $STORAGE_ACCOUNT \
+              --resource-group $(resourceGroupName) \
+              --query "primaryEndpoints.web" \
+              --output tsv)
+            
+            echo "Static website deployed at: $WEBSITE_URL"
+          fi

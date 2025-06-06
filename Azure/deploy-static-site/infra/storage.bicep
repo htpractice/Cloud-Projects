@@ -1,24 +1,49 @@
 // storage.bicep
-// Deploys ZRS in EastUS and GRS in EastUS2 with access controls
-resource zrsStorage 'Microsoft.Storage/storageAccounts@2023-01-01' = {
-  name: 'eastuszrsstorage'
-  location: 'East US'
+// Deploys storage accounts with static website hosting enabled
+param location1 string = 'East US'
+param location2 string = 'East US 2'
+
+resource primaryStorage 'Microsoft.Storage/storageAccounts@2023-01-01' = {
+  name: 'eastuszrsstatic${uniqueString(resourceGroup().id)}'
+  location: location1
   sku: {
-    name: 'Standard_LRS' // Updated to comply with allowed types
+    name: 'Standard_LRS'
   }
   kind: 'StorageV2'
-  properties: {}
+  properties: {
+    allowBlobPublicAccess: true
+    supportsHttpsTrafficOnly: true
+    minimumTlsVersion: 'TLS1_2'
+    accessTier: 'Hot'
+  }
 }
 
-resource grsStorage 'Microsoft.Storage/storageAccounts@2023-01-01' = {
-  name: 'eastus2grsstorage'
-  location: 'East US 2'
+// Enable static website hosting
+resource staticWebsite 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-01-01' = {
+  name: '${primaryStorage.name}/default/$web'
+  properties: {
+    publicAccess: 'Blob'
+  }
+}
+
+// Secondary storage for backup/redundancy
+resource backupStorage 'Microsoft.Storage/storageAccounts@2023-01-01' = {
+  name: 'eastus2grsbackup${uniqueString(resourceGroup().id)}'
+  location: location2
   sku: {
     name: 'Standard_GRS'
   }
   kind: 'StorageV2'
-  properties: {}
+  properties: {
+    allowBlobPublicAccess: false
+    supportsHttpsTrafficOnly: true
+    minimumTlsVersion: 'TLS1_2'
+    accessTier: 'Cool' // Backup storage can use cool tier for cost savings
+  }
 }
 
-output zrsConnectionString string = listKeys(zrsStorage.name, '2023-01-01').keys[0].value
-output grsConnectionString string = listKeys(grsStorage.name, '2023-01-01').keys[0].value
+output primaryStorageId string = primaryStorage.id
+output primaryStorageName string = primaryStorage.name
+output staticWebsiteUrl string = primaryStorage.properties.primaryEndpoints.web
+output backupStorageId string = backupStorage.id
+output backupStorageName string = backupStorage.name

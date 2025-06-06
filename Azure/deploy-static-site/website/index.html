@@ -3,10 +3,226 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Static Website</title>
+    <title>Azure Static Website | Cloud-Hosted Solution</title>
+    <meta name="description" content="Professional static website hosted on Azure with modern infrastructure">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 3rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: #0078d4;
+            border-radius: 15px;
+            margin: 0 auto 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+            font-weight: 300;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .feature {
+            text-align: left;
+            padding: 1.5rem;
+            background: rgba(240, 248, 255, 0.8);
+            border-radius: 10px;
+            border-left: 4px solid #0078d4;
+        }
+        
+        .feature h3 {
+            color: #0078d4;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 2rem 0;
+            text-align: center;
+        }
+        
+        .stat {
+            color: #2c3e50;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #0078d4;
+        }
+        
+        .cta {
+            background: #0078d4;
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+        
+        .cta:hover {
+            background: #106ebe;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(16, 110, 190, 0.3);
+        }
+        
+        .footer {
+            margin-top: 2rem;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .card {
+                padding: 2rem 1.5rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome to the Static Website!</h1>
-    <p>This is a simple static website hosted on Azure.</p>
+    <div class="container">
+        <div class="card">
+            <div class="logo">Az</div>
+            <h1>Azure Static Website</h1>
+            <p class="subtitle">Modern, Scalable, and Secure Cloud-Hosted Solution</p>
+            
+            <div class="features">
+                <div class="feature">
+                    <h3>🚀 High Performance</h3>
+                    <p>Deployed on Azure's global CDN network for lightning-fast loading times worldwide.</p>
+                </div>
+                <div class="feature">
+                    <h3>🔒 Enterprise Security</h3>
+                    <p>Built with Azure's security best practices including HTTPS, WAF, and access controls.</p>
+                </div>
+                <div class="feature">
+                    <h3>💰 Cost Optimized</h3>
+                    <p>Serverless architecture with pay-per-use model, reducing operational costs by 90%.</p>
+                </div>
+            </div>
+            
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-number">99.9%</div>
+                    <div>Uptime SLA</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">&lt;100ms</div>
+                    <div>Load Time</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">Global</div>
+                    <div>CDN Reach</div>
+                </div>
+            </div>
+            
+            <button class="cta" onclick="showInfo()">Learn More About Our Infrastructure</button>
+            
+            <div class="footer">
+                <p>Powered by Microsoft Azure | Deployed with Azure DevOps</p>
+                <p>Last updated: <span id="timestamp"></span></p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Update timestamp
+        document.getElementById('timestamp').textContent = new Date().toLocaleString();
+        
+        function showInfo() {
+            alert(`Infrastructure Details:
+            
+✅ Azure Storage Static Website Hosting
+✅ Azure CDN for Global Distribution  
+✅ Azure DevOps CI/CD Pipeline
+✅ Infrastructure as Code (Bicep)
+✅ Multi-Region Backup Strategy
+✅ Enterprise Security Controls
+
+Cost: ~$1-5/month vs $200+/month for VM hosting`);
+        }
+        
+        // Add some interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            const features = document.querySelectorAll('.feature');
+            features.forEach((feature, index) => {
+                feature.style.opacity = '0';
+                feature.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    feature.style.transition = 'all 0.6s ease';
+                    feature.style.opacity = '1';
+                    feature.style.transform = 'translateY(0)';
+                }, 200 * (index + 1));
+            });
+        });
+    </script>
 </body>
 </html>
