@@ -1,0 +1,23 @@
+[Unit]
+Description=LookMyShow Flask API (Application Tier)
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/lookmyshow/backend
+Environment=PATH=/opt/lookmyshow/venv/bin
+Environment=DB_HOST=104.198.208.198
+Environment=DB_USER=root
+Environment=DB_PASSWORD=M7rk|(`J&H1+*I>i
+Environment=DB_NAME=eventsdb
+Environment=API_HOST=0.0.0.0
+Environment=API_PORT=5000
+Environment=CORS_ORIGINS=*
+ExecStart=/opt/lookmyshow/venv/bin/python app.py
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target 

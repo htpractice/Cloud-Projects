@@ -1,7 +1,6 @@
-// Configuration for API endpoints
-const API_BASE_URL = window.location.hostname === 'localhost' 
-    ? 'http://localhost:5000/api' 
-    : '/api'; // Use relative path for production deployment
+// Configuration for API endpoints - UPDATE THIS WITH YOUR VM'S IP
+const VM_IP = 'YOUR_VM_EXTERNAL_IP'; // Replace with your VM's external IP
+const API_BASE_URL = `http://${VM_IP}:5000/api`;
 
 // Presentation Tier - Event Management
 class EventManager {
@@ -20,7 +19,7 @@ class EventManager {
             this.renderEvents(events);
         } catch (error) {
             console.error('Error loading events:', error);
-            this.showError('Failed to load events. Please try again later.');
+            this.showError('Failed to load events. Please check if the API server is running.');
         }
     }
 
@@ -77,7 +76,7 @@ class EventManager {
             }
         } catch (error) {
             console.error('Error booking ticket:', error);
-            alert('Booking failed. Please try again later.');
+            alert('Booking failed. Please check if the API server is running.');
         }
     }
 
@@ -141,5 +140,4 @@ document.addEventListener("DOMContentLoaded", () => {
     eventManager = new EventManager();
     eventManager.loadEvents();
     eventManager.loadBookings();
-});
-
+}); 
