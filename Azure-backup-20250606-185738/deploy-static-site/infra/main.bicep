@@ -24,14 +24,6 @@ module vnets 'vnets.bicep' = {
   }
 }
 
-module storage 'storage.bicep' = {
-  name: 'storageDeployment'
-  params: {
-    location1: location1
-    location2: location2
-  }
-}
-
 module bastion 'bastion.bicep' = {
   name: 'bastionDeployment'
   dependsOn: [vnets]
@@ -70,7 +62,16 @@ module firewall 'firewall.bicep' = {
   }
 }
 
-// Outputs for important resources
-output staticWebsiteUrl string = storage.outputs.staticWebsiteUrl
-output primaryStorageName string = storage.outputs.primaryStorageName
-output backupStorageName string = storage.outputs.backupStorageName
+resource storageAccount 'Microsoft.Storage/storageAccounts@2021-09-01' = {
+  name: 'eastuszrsstorage'
+  location: location1
+  sku: {
+    name: 'Standard_LRS' // Updated to comply with allowed storage account types
+  }
+  kind: 'StorageV2'
+}
+
+module storage 'storage.bicep' = {
+  name: 'storageDeployment'
+  dependsOn: [vnets]
+}
